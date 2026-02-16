@@ -1,6 +1,6 @@
 // ============================================================
 // JJTT 카페24 Webhook 수신 서버
-// 카페24 주문 발생 시 기부 카테고리를 파악해서 Supabase에 저장
+// 주문 접수 → +1 / 취소 → -1
 // ============================================================
 
 const { createClient } = require('@supabase/supabase-js');
@@ -24,20 +24,15 @@ function detectCategory(optionValue) {
 // 주문 데이터에서 기부처 옵션 추출
 function extractCategories(orderData) {
   const categories = [];
-
   try {
     const items = orderData?.items || orderData?.order_items || [];
-
     for (const item of items) {
-      // 옵션 배열 탐색
       const options = item?.options || item?.product_options || [];
       for (const opt of options) {
         const val = opt?.value || opt?.option_value || opt?.name || '';
         const cat = detectCategory(val);
         if (cat) categories.push({ cat, optionValue: val });
       }
-
-      // 옵션이 문자열로 들어오는 경우
       if (typeof item?.option_value === 'string') {
         const cat = detectCategory(item.option_value);
         if (cat) categories.push({ cat, optionValue: item.option_value });
@@ -46,12 +41,17 @@ function extractCategories(orderData) {
   } catch (e) {
     console.error('extractCategories error:', e);
   }
-
   return categories;
 }
 
+// 취소 이벤트인지 판별
+function isCancelEvent(body) {
+  const eventName = body?.event_no || body?.event || body?.resource?.status || '';
+  const cancelKeywords = ['cancel', 'cancelled', '취소'];
+  return cancelKeywords.some(k => eventName.toString().toLowerCase().includes(k));
+}
+
 module.exports = async function handler(req, res) {
-  // CORS 헤더
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Cafe24-Signature');
@@ -64,6 +64,7 @@ module.exports = async function handler(req, res) {
     console.log('Webhook received:', JSON.stringify(body).slice(0, 500));
 
     const orderId = body?.order_id || body?.resource?.order_id || 'unknown';
+    const isCancel = isCancelEvent(body);
     const categories = extractCategories(body?.resource || body);
 
     if (categories.length === 0) {
@@ -71,23 +72,24 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ message: 'No matching category', orderId });
     }
 
-    // 카테고리별 카운트 업데이트
+    const action = isCancel ? 'decrement_count' : 'increment_count';
+    const logAction = isCancel ? 'cancel' : 'order';
+
     for (const { cat, optionValue } of categories) {
-      // 카운트 +1
-      const { data, error } = await supabase.rpc('increment_count', { cat_id: cat });
+      const { error } = await supabase.rpc(action, { cat_id: cat });
       if (error) throw error;
 
-      // 로그 저장
       await supabase.from('donation_logs').insert({
         order_id: orderId,
         category: cat,
         option_value: optionValue,
+        action: logAction,
       });
 
-      console.log(`Updated ${cat} for order ${orderId}`);
+      console.log(`[${logAction}] ${cat} for order ${orderId}`);
     }
 
-    return res.status(200).json({ success: true, orderId, categories });
+    return res.status(200).json({ success: true, orderId, action: logAction, categories });
 
   } catch (err) {
     console.error('Webhook error:', err);
