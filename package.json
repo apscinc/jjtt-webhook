@@ -1,0 +1,8 @@
+{
+  "name": "jjtt-donation-webhook",
+  "version": "1.0.0",
+  "description": "JJTT 카페24 Webhook 서버 + 기부현황 API",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}
