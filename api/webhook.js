@@ -1,6 +1,6 @@
 // ============================================================
 // JJTT 카페24 Webhook 수신 서버
-// 주문 접수 → +1 / 취소 → -1
+// 주문 접수 → +1 / 취소 → -1 / 2000 달성 → 자동 리셋
 // ============================================================
 
 const { createClient } = require('@supabase/supabase-js');
@@ -9,6 +9,8 @@ const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SECRET_KEY
 );
+
+const GOAL = 2000;
 
 // 옵션명 → 카테고리 매핑
 function detectCategory(optionValue) {
@@ -51,6 +53,43 @@ function isCancelEvent(body) {
   return cancelKeywords.some(k => eventName.toString().toLowerCase().includes(k));
 }
 
+// 2000 달성 체크 → 달성 시 리셋 + delivered +1 + 히스토리 기록
+async function checkAndReset(cat) {
+  const { data, error } = await supabase
+    .from('donation_counts')
+    .select('count, delivered')
+    .eq('category', cat)
+    .single();
+
+  if (error || !data) return;
+  if (data.count < GOAL) return;
+
+  // 달성! 리셋 + delivered +1
+  const newDelivered = data.delivered + 1;
+  const { error: updateError } = await supabase
+    .from('donation_counts')
+    .update({
+      count: data.count - GOAL,  // 초과분은 다음 라운드로 이월
+      delivered: newDelivered,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('category', cat);
+
+  if (updateError) {
+    console.error('Reset error:', updateError);
+    return;
+  }
+
+  // 히스토리 기록
+  await supabase.from('donation_history').insert({
+    category: cat,
+    delivered_round: newDelivered,
+    delivered_at: new Date().toISOString(),
+  });
+
+  console.log(`🎉 [GOAL] ${cat} reached ${GOAL}! Round ${newDelivered} delivered. Reset done.`);
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -76,15 +115,22 @@ module.exports = async function handler(req, res) {
     const logAction = isCancel ? 'cancel' : 'order';
 
     for (const { cat, optionValue } of categories) {
+      // +1 또는 -1
       const { error } = await supabase.rpc(action, { cat_id: cat });
       if (error) throw error;
 
+      // 로그 저장
       await supabase.from('donation_logs').insert({
         order_id: orderId,
         category: cat,
         option_value: optionValue,
         action: logAction,
       });
+
+      // 주문 시에만 달성 체크
+      if (!isCancel) {
+        await checkAndReset(cat);
+      }
 
       console.log(`[${logAction}] ${cat} for order ${orderId}`);
     }
