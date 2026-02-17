@@ -1,7 +1,7 @@
 // ============================================================
 // JJTT 카페24 Webhook 수신 서버
-// 주문 접수 → +1 / 취소 → -1 / 2000 달성 → 자동 리셋
-// 주문/취소 모두 중복 방지
+// 주문 접수 → +N / 취소 → -N / 2000 달성 → 자동 리셋
+// 주문/취소 모두 중복 방지, 수량 반영
 // ============================================================
 
 const { createClient } = require('@supabase/supabase-js');
@@ -28,15 +28,17 @@ function extractCategories(orderData) {
   try {
     const items = orderData?.items || orderData?.order_items || [];
     for (const item of items) {
+      const optionValue = item?.option_value || '';
+      const qty = parseInt(item?.qty) || 1;
+      const cat = detectCategory(optionValue);
+      if (cat) categories.push({ cat, optionValue, qty });
+
+      // 기존 방식 (options 배열)
       const options = item?.options || item?.product_options || [];
       for (const opt of options) {
         const val = opt?.value || opt?.option_value || opt?.name || '';
-        const cat = detectCategory(val);
-        if (cat) categories.push({ cat, optionValue: val });
-      }
-      if (typeof item?.option_value === 'string') {
-        const cat = detectCategory(item.option_value);
-        if (cat) categories.push({ cat, optionValue: item.option_value });
+        const c = detectCategory(val);
+        if (c) categories.push({ cat: c, optionValue: val, qty });
       }
     }
   } catch (e) {
@@ -49,6 +51,22 @@ function isCancelEvent(body) {
   const eventName = body?.event_no || body?.event || body?.resource?.status || '';
   const cancelKeywords = ['cancel', 'cancelled', '취소'];
   return cancelKeywords.some(k => eventName.toString().toLowerCase().includes(k));
+}
+
+async function adjustCount(cat, qty) {
+  // qty만큼 반복해서 increment
+  for (let i = 0; i < qty; i++) {
+    const { error } = await supabase.rpc('increment_count', { cat_id: cat });
+    if (error) throw error;
+    await checkAndReset(cat);
+  }
+}
+
+async function decrementCount(cat, qty) {
+  for (let i = 0; i < qty; i++) {
+    const { error } = await supabase.rpc('decrement_count', { cat_id: cat });
+    if (error) throw error;
+  }
 }
 
 async function checkAndReset(cat) {
@@ -79,7 +97,6 @@ async function checkAndReset(cat) {
   console.log(`🎉 [GOAL] ${cat} reached ${GOAL}! Round ${newDelivered} delivered.`);
 }
 
-// 중복 체크 (주문/취소 공통)
 async function isDuplicate(orderId, action) {
   const { data } = await supabase
     .from('donation_logs')
@@ -110,18 +127,19 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ message: 'No matching category', orderId });
     }
 
-    // ── 중복 체크 (주문/취소 모두) ──
+    // 중복 체크
     const duplicate = await isDuplicate(orderId, logAction);
     if (duplicate) {
       console.log(`⚠️ 중복 [${logAction}] 무시: ${orderId}`);
       return res.status(200).json({ message: 'Already processed', orderId, action: logAction });
     }
 
-    const rpcAction = isCancel ? 'decrement_count' : 'increment_count';
-
-    for (const { cat, optionValue } of categories) {
-      const { error } = await supabase.rpc(rpcAction, { cat_id: cat });
-      if (error) throw error;
+    for (const { cat, optionValue, qty } of categories) {
+      if (isCancel) {
+        await decrementCount(cat, qty);
+      } else {
+        await adjustCount(cat, qty);
+      }
 
       await supabase.from('donation_logs').insert({
         order_id: orderId,
@@ -130,9 +148,7 @@ module.exports = async function handler(req, res) {
         action: logAction,
       });
 
-      if (!isCancel) await checkAndReset(cat);
-
-      console.log(`[${logAction}] ${cat} for order ${orderId}`);
+      console.log(`[${logAction}] ${cat} x${qty} for order ${orderId}`);
     }
 
     return res.status(200).json({ success: true, orderId, action: logAction, categories });
