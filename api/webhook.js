@@ -1,7 +1,7 @@
 // ============================================================
 // JJTT 카페24 Webhook 수신 서버
 // 주문 접수 → +1 / 취소 → -1 / 2000 달성 → 자동 리셋
-// 중복 주문 방지: order_id 기준으로 이미 처리된 주문은 무시
+// 주문/취소 모두 중복 방지
 // ============================================================
 
 const { createClient } = require('@supabase/supabase-js');
@@ -79,6 +79,17 @@ async function checkAndReset(cat) {
   console.log(`🎉 [GOAL] ${cat} reached ${GOAL}! Round ${newDelivered} delivered.`);
 }
 
+// 중복 체크 (주문/취소 공통)
+async function isDuplicate(orderId, action) {
+  const { data } = await supabase
+    .from('donation_logs')
+    .select('id')
+    .eq('order_id', orderId)
+    .eq('action', action)
+    .limit(1);
+  return data && data.length > 0;
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -92,32 +103,24 @@ module.exports = async function handler(req, res) {
     const orderId = body?.order_id || body?.resource?.order_id || 'unknown';
     const isCancel = isCancelEvent(body);
     const categories = extractCategories(body?.resource || body);
+    const logAction = isCancel ? 'cancel' : 'order';
 
     if (categories.length === 0) {
       console.log('No matching category for order:', orderId);
       return res.status(200).json({ message: 'No matching category', orderId });
     }
 
-    // ── 중복 주문 체크 ──
-    if (!isCancel) {
-      const { data: existing } = await supabase
-        .from('donation_logs')
-        .select('id')
-        .eq('order_id', orderId)
-        .eq('action', 'order')
-        .limit(1);
-
-      if (existing && existing.length > 0) {
-        console.log(`⚠️ 중복 주문 무시: ${orderId}`);
-        return res.status(200).json({ message: 'Already processed', orderId });
-      }
+    // ── 중복 체크 (주문/취소 모두) ──
+    const duplicate = await isDuplicate(orderId, logAction);
+    if (duplicate) {
+      console.log(`⚠️ 중복 [${logAction}] 무시: ${orderId}`);
+      return res.status(200).json({ message: 'Already processed', orderId, action: logAction });
     }
 
-    const action = isCancel ? 'decrement_count' : 'increment_count';
-    const logAction = isCancel ? 'cancel' : 'order';
+    const rpcAction = isCancel ? 'decrement_count' : 'increment_count';
 
     for (const { cat, optionValue } of categories) {
-      const { error } = await supabase.rpc(action, { cat_id: cat });
+      const { error } = await supabase.rpc(rpcAction, { cat_id: cat });
       if (error) throw error;
 
       await supabase.from('donation_logs').insert({
