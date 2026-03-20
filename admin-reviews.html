@@ -45,7 +45,6 @@
 <div class="container">
   <h1>📝 JJTT 후기 관리</h1>
 
-  <!-- URL 입력 -->
   <div class="card">
     <label>블로그 URL 입력</label>
     <input type="text" id="urlInput" placeholder="https://blog.naver.com/..." />
@@ -53,7 +52,6 @@
       <button class="btn btn-primary" onclick="fetchOG()">미리보기</button>
     </div>
 
-    <!-- 미리보기 -->
     <div id="preview">
       <img id="prevImg" src="" alt="썸네일" onerror="this.style.display='none'">
       <div class="preview-body">
@@ -68,7 +66,6 @@
     <div class="status-msg" id="statusMsg"></div>
   </div>
 
-  <!-- 후기 목록 -->
   <div class="card">
     <label>등록된 후기 목록</label>
     <div class="review-list" id="reviewList">
@@ -84,6 +81,11 @@
 
   let ogData = {};
 
+  function proxyImg(url) {
+    if (!url) return '';
+    return `${VERCEL_URL}/api/proxy-image?url=${encodeURIComponent(url)}`;
+  }
+
   async function fetchOG() {
     const url = document.getElementById('urlInput').value.trim();
     if (!url) return alert('URL을 입력해주세요');
@@ -98,7 +100,8 @@
 
       ogData = { ...data, blog_url: url };
 
-      document.getElementById('prevImg').src = data.thumbnail_url || '';
+      document.getElementById('prevImg').src = proxyImg(data.thumbnail_url);
+      document.getElementById('prevImg').style.display = 'block';
       document.getElementById('prevTitle').textContent = data.title || '(제목 없음)';
       document.getElementById('prevDesc').textContent = data.description || '';
       document.getElementById('preview').style.display = 'block';
@@ -145,7 +148,7 @@
 
     list.innerHTML = data.map(r => `
       <div class="review-item" id="item-${r.id}">
-        <img src="${r.thumbnail_url || ''}" alt="썸네일" onerror="this.style.background='#eee'">
+        <img src="${proxyImg(r.thumbnail_url)}" alt="썸네일" onerror="this.style.background='#eee';this.style.display='none'">
         <div class="review-info">
           <div class="review-title">${r.title || '(제목 없음)'}</div>
           <div class="review-url">${r.blog_url}</div>
