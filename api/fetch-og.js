@@ -5,7 +5,6 @@ export default async function handler(req, res) {
   let { url } = req.query;
   if (!url) return res.status(400).json({ error: 'URL이 필요합니다' });
 
-  // 네이버 블로그 모바일 버전으로 변환
   url = url.replace('blog.naver.com', 'm.blog.naver.com');
 
   try {
@@ -24,8 +23,12 @@ export default async function handler(req, res) {
       return match ? match[1] : null;
     };
 
+    // blogthumb.pstatic.net 에서 실제 포스트 썸네일 찾기
+    const thumbMatch = html.match(/https?:\/\/blogthumb\.pstatic\.net\/[^"'\s]+/);
+    const thumbnail_url = thumbMatch ? thumbMatch[0] : get('og:image');
+
     res.status(200).json({
-      thumbnail_url: get('og:image'),
+      thumbnail_url,
       title: get('og:title'),
       description: get('og:description'),
     });
