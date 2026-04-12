@@ -8,34 +8,33 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{background:#f5f0e8;font-family:'Noto Sans KR',sans-serif}
-.page{max-width:620px;margin:0 auto;padding:28px 16px 48px}
+.page{max-width:960px;margin:0 auto;padding:24px 16px 48px}
 
-.hd{text-align:center;margin-bottom:18px}
+.hd{text-align:center;margin-bottom:16px}
 .hd-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.3em;color:#8a6a2a;border:1px solid rgba(138,106,42,.3);padding:5px 14px;margin-bottom:10px}
 .hd-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:.05em;color:#2a2018}
 .hd-sub{font-size:12px;color:rgba(42,32,24,.48);margin-top:5px;letter-spacing:.03em}
 
-.total-bar{display:flex;justify-content:center;align-items:baseline;gap:8px;margin-bottom:18px;font-family:'DM Mono',monospace;font-size:11px;color:rgba(42,32,24,.5);letter-spacing:.08em}
+.scene{background:white;border-radius:16px;overflow:hidden;box-shadow:0 6px 32px rgba(0,0,0,.1)}
+#sv{width:100%;display:block}
+
+.total-bar{display:flex;justify-content:center;align-items:baseline;gap:8px;margin-top:14px;font-family:'DM Mono',monospace;font-size:11px;color:rgba(42,32,24,.5);letter-spacing:.08em}
 .total-bar strong{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#2a2018;letter-spacing:.03em}
-
-.tree-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
-.tree-card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 3px 18px rgba(0,0,0,.08)}
-.tree-card svg{width:100%;display:block}
-.tree-info{padding:10px 14px 13px;display:flex;align-items:center;gap:8px}
-.t-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
-.t-name{font-size:11px;font-weight:500;color:#2a2018;line-height:1.3}
-.t-cnt{font-family:'DM Mono',monospace;font-size:10px;color:rgba(42,32,24,.42);margin-top:2px}
 
 .share-btn{display:block;width:100%;margin-top:12px;padding:12px;background:white;border:1px solid rgba(138,106,42,.2);border-radius:10px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;color:#8a6a2a;cursor:pointer;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:background .2s}
 .share-btn:hover{background:#faf8f2}
 .share-btn.ok{background:#f0f8ec;color:#4a7a30;border-color:rgba(74,122,48,.3)}
-.ft{text-align:center;margin-top:18px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;color:rgba(42,32,24,.28)}
+.ft{text-align:center;margin-top:16px;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;color:rgba(42,32,24,.28)}
 
-@keyframes flyIn{0%{opacity:0;transform:translate(-42px,20px) scale(.5)}65%{opacity:1;transform:translate(3px,-3px) scale(1.04)}100%{opacity:1;transform:translate(0,0) scale(1)}}
+@keyframes flyInL{0%{opacity:0;transform:translate(-50px,24px) scale(.48)}65%{opacity:1;transform:translate(3px,-3px) scale(1.05)}100%{opacity:1;transform:translate(0,0) scale(1)}}
+@keyframes flyInR{0%{opacity:0;transform:translate(50px,24px) scale(.48)}65%{opacity:1;transform:translate(-3px,-3px) scale(1.05)}100%{opacity:1;transform:translate(0,0) scale(1)}}
+@keyframes flyInT{0%{opacity:0;transform:translate(0,-46px) scale(.48)}65%{opacity:1;transform:translate(0,4px) scale(1.05)}100%{opacity:1;transform:translate(0,0) scale(1)}}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
-@keyframes sway{0%,100%{transform:rotate(0deg)}50%{transform:rotate(1deg)}}
-.bird-g{animation:flyIn .85s cubic-bezier(.34,1.56,.64,1) both}
+
+.bird-g{animation-duration:.88s;animation-timing-function:cubic-bezier(.34,1.56,.64,1);animation-fill-mode:both}
+.fl{animation-name:flyInL}
+.fr{animation-name:flyInR}
+.ft2{animation-name:flyInT}
 .bird-bd{animation:bob var(--bd,3s) ease-in-out infinite var(--dd,0s)}
 </style>
 </head>
@@ -48,11 +47,175 @@ html,body{background:#f5f0e8;font-family:'Noto Sans KR',sans-serif}
   <div class="hd-sub">10켤레당 새 한 마리 · 나무당 최대 10마리</div>
 </div>
 
+<div class="scene">
+<svg id="sv" viewBox="0 0 920 520" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#b8d8f0"/>
+    <stop offset="55%"  stop-color="#d8eec8"/>
+    <stop offset="100%" stop-color="#e8d8b0"/>
+  </linearGradient>
+  <linearGradient id="hillG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#a8cc88"/>
+    <stop offset="100%" stop-color="#90b870"/>
+  </linearGradient>
+  <linearGradient id="meadG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#78b040"/>
+    <stop offset="100%" stop-color="#60982c"/>
+  </linearGradient>
+  <filter id="lf" x="-14%" y="-14%" width="128%" height="128%">
+    <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="rgba(0,50,0,.16)"/>
+  </filter>
+</defs>
+
+<!-- SKY -->
+<rect width="920" height="520" fill="url(#skyG)"/>
+
+<!-- CLOUDS -->
+<g opacity=".52">
+  <ellipse cx="78"  cy="64"  rx="46" ry="24" fill="white"/>
+  <ellipse cx="114" cy="54"  rx="36" ry="22" fill="white"/>
+  <ellipse cx="48"  cy="58"  rx="30" ry="18" fill="white"/>
+  <ellipse cx="510" cy="78"  rx="44" ry="22" fill="white"/>
+  <ellipse cx="548" cy="68"  rx="34" ry="20" fill="white"/>
+  <ellipse cx="830" cy="56"  rx="40" ry="20" fill="white"/>
+  <ellipse cx="866" cy="48"  rx="30" ry="18" fill="white"/>
+</g>
+
+<!-- DISTANT HILLS -->
+<path d="M0,360 Q120,300 240,330 Q360,360 480,310 Q600,260 720,305 Q840,350 920,320 L920,420 L0,420Z" fill="url(#hillG)" opacity=".75"/>
+
+<!-- MEADOW -->
+<path d="M0,420 Q200,405 400,415 Q600,425 760,410 Q860,402 920,412 L920,520 L0,520Z" fill="url(#meadG)"/>
+
+<!-- GRASS TUFTS -->
+<g fill="#58a030" opacity=".6">
+  <path d="M46,428 Q50,410 56,428"/><path d="M62,430 Q67,414 72,430"/>
+  <path d="M210,422 Q215,406 220,422"/>
+  <path d="M385,418 Q390,403 396,418"/>
+  <path d="M570,424 Q575,408 580,424"/>
+  <path d="M748,420 Q753,405 758,420"/>
+  <path d="M880,424 Q884,410 889,424"/>
+</g>
+
+<!-- SMALL FLOWERS -->
+<g opacity=".7">
+  <circle cx="170" cy="426" r="3" fill="#f0c040"/>
+  <circle cx="450" cy="418" r="3" fill="#f04040"/>
+  <circle cx="680" cy="422" r="2.5" fill="#c040f0"/>
+  <circle cx="855" cy="420" r="3" fill="#f0c040"/>
+  <circle cx="300" cy="430" r="2.5" fill="#40c0f0"/>
+</g>
+
+<!-- ════════════════════════════════════════ -->
+<!-- TREE 1 — TALL POPLAR (x=115) -->
+<!-- ════════════════════════════════════════ -->
+<path d="M115,444 C113,416 111,384 112,358 C113,334 115,312 113,289 C111,268 109,250 113,234" stroke="#7a4c28" stroke-width="18" fill="none" stroke-linecap="round"/>
+<!-- trunk texture -->
+<path d="M111,390 C113,372 114,354 112,336" stroke="#5a3415" stroke-width="1.5" fill="none" opacity=".3" stroke-linecap="round"/>
+<!-- branches -->
+<path d="M113,276 C99,267 82,254 66,240" stroke="#7a4c28" stroke-width="9"  fill="none" stroke-linecap="round"/>
+<path d="M113,309 C99,300 82,286 66,271" stroke="#7a4c28" stroke-width="8"  fill="none" stroke-linecap="round"/>
+<path d="M114,273 C128,264 145,251 159,237" stroke="#7a4c28" stroke-width="9"  fill="none" stroke-linecap="round"/>
+<path d="M114,306 C128,297 145,284 159,270" stroke="#7a4c28" stroke-width="8"  fill="none" stroke-linecap="round"/>
+<!-- tall oval crown -->
+<g filter="url(#lf)">
+  <ellipse cx="113" cy="172" rx="72" ry="120" fill="#3a6830" opacity=".91"/>
+  <ellipse cx="86"  cy="190" rx="54" ry="90"  fill="#4c8840" opacity=".87"/>
+  <ellipse cx="140" cy="188" rx="54" ry="90"  fill="#4c8840" opacity=".87"/>
+  <ellipse cx="113" cy="144" rx="60" ry="92"  fill="#589848" opacity=".78"/>
+  <ellipse cx="113" cy="110" rx="46" ry="70"  fill="#6eb052" opacity=".46"/>
+  <ellipse cx="113" cy="82"  rx="32" ry="48"  fill="#86c868" opacity=".38"/>
+</g>
+
+<!-- ════════════════════════════════════════ -->
+<!-- TREE 2 — WIDE OAK (x=322) -->
+<!-- ════════════════════════════════════════ -->
+<path d="M322,448 C320,420 318,388 320,362 C322,340 324,318 322,300" stroke="#7a4c28" stroke-width="26" fill="none" stroke-linecap="round"/>
+<path d="M320,325 C294,320 262,310 230,294 C200,280 172,265 148,249" stroke="#7a4c28" stroke-width="13" fill="none" stroke-linecap="round"/>
+<path d="M324,320 C350,315 382,305 414,289 C444,275 472,260 496,244" stroke="#7a4c28" stroke-width="13" fill="none" stroke-linecap="round"/>
+<path d="M248,307 C228,292 210,277 194,262" stroke="#7a4c28" stroke-width="8"  fill="none" stroke-linecap="round"/>
+<path d="M396,303 C416,288 434,273 450,258" stroke="#7a4c28" stroke-width="8"  fill="none" stroke-linecap="round"/>
+<g filter="url(#lf)">
+  <ellipse cx="322" cy="258" rx="142" ry="110" fill="#3a6830" opacity=".91"/>
+  <ellipse cx="270" cy="274" rx="100" ry="82"  fill="#4c8840" opacity=".87"/>
+  <ellipse cx="374" cy="272" rx="100" ry="82"  fill="#4c8840" opacity=".87"/>
+  <ellipse cx="186" cy="276" rx="76"  ry="65"  fill="#3a6830" opacity=".88"/>
+  <ellipse cx="458" cy="274" rx="76"  ry="65"  fill="#3a6830" opacity=".88"/>
+  <ellipse cx="322" cy="236" rx="108" ry="86"  fill="#589848" opacity=".78"/>
+  <ellipse cx="322" cy="216" rx="76"  ry="60"  fill="#6eb052" opacity=".46"/>
+</g>
+
+<!-- ════════════════════════════════════════ -->
+<!-- TREE 3 — ASYMMETRIC BIRCH (x=560) -->
+<!-- ════════════════════════════════════════ -->
+<path d="M560,442 C558,414 556,382 558,356 C560,332 562,310 560,286 C558,267 556,250 560,235" stroke="#7a4c28" stroke-width="19" fill="none" stroke-linecap="round"/>
+<!-- slightly curved trunk hint -->
+<path d="M558,380 C560,360 562,342 560,324" stroke="#5a3415" stroke-width="1.5" fill="none" opacity=".28" stroke-linecap="round"/>
+<!-- sparse left -->
+<path d="M560,268 C538,264 512,254 488,240 C466,228 447,216 432,203" stroke="#7a4c28" stroke-width="10" fill="none" stroke-linecap="round"/>
+<!-- heavy right -->
+<path d="M561,262 C587,257 617,247 648,232 C676,218 702,204 724,191" stroke="#7a4c28" stroke-width="14" fill="none" stroke-linecap="round"/>
+<path d="M597,248 C623,234 648,220 670,206" stroke="#7a4c28" stroke-width="9"  fill="none" stroke-linecap="round"/>
+<path d="M560,295 C542,290 524,282 508,270" stroke="#7a4c28" stroke-width="8"  fill="none" stroke-linecap="round"/>
+<g filter="url(#lf)">
+  <ellipse cx="594" cy="220" rx="142" ry="104" fill="#3a6830" opacity=".91"/>
+  <ellipse cx="652" cy="208" rx="98"  ry="80"  fill="#4c8840" opacity=".87"/>
+  <ellipse cx="538" cy="234" rx="72"  ry="62"  fill="#3a6830" opacity=".87"/>
+  <ellipse cx="720" cy="204" rx="72"  ry="62"  fill="#4c8840" opacity=".88"/>
+  <ellipse cx="442" cy="228" rx="60"  ry="52"  fill="#3a6830" opacity=".82"/>
+  <ellipse cx="602" cy="198" rx="104" ry="80"  fill="#589848" opacity=".78"/>
+  <ellipse cx="664" cy="190" rx="70"  ry="54"  fill="#6eb052" opacity=".46"/>
+</g>
+
+<!-- ════════════════════════════════════════ -->
+<!-- TREE 4 — TWIN CROWN (x=762) -->
+<!-- ════════════════════════════════════════ -->
+<path d="M762,445 C760,416 758,383 760,357 C762,333 764,311 762,291 C760,272 758,255 762,238" stroke="#7a4c28" stroke-width="22" fill="none" stroke-linecap="round"/>
+<!-- split branches -->
+<path d="M762,268 C744,262 724,249 705,233 C688,218 674,204 662,189" stroke="#7a4c28" stroke-width="14" fill="none" stroke-linecap="round"/>
+<path d="M763,265 C781,259 801,246 820,230 C838,215 852,201 864,186" stroke="#7a4c28" stroke-width="14" fill="none" stroke-linecap="round"/>
+<path d="M704,237 C690,221 678,207 668,193" stroke="#7a4c28" stroke-width="8"  fill="none" stroke-linecap="round"/>
+<path d="M821,234 C835,218 847,205 857,191" stroke="#7a4c28" stroke-width="8"  fill="none" stroke-linecap="round"/>
+<g filter="url(#lf)">
+  <!-- left lobe -->
+  <ellipse cx="722" cy="215" rx="84"  ry="74"  fill="#3a6830" opacity=".91"/>
+  <ellipse cx="696" cy="228" rx="62"  ry="54"  fill="#4c8840" opacity=".87"/>
+  <ellipse cx="750" cy="222" rx="60"  ry="52"  fill="#4c8840" opacity=".85"/>
+  <ellipse cx="722" cy="196" rx="66"  ry="56"  fill="#589848" opacity=".78"/>
+  <!-- right lobe -->
+  <ellipse cx="802" cy="213" rx="84"  ry="74"  fill="#3a6830" opacity=".91"/>
+  <ellipse cx="776" cy="226" rx="60"  ry="52"  fill="#4c8840" opacity=".85"/>
+  <ellipse cx="828" cy="220" rx="62"  ry="54"  fill="#4c8840" opacity=".87"/>
+  <ellipse cx="802" cy="194" rx="66"  ry="56"  fill="#589848" opacity=".78"/>
+  <!-- bridge -->
+  <ellipse cx="762" cy="228" rx="52"  ry="44"  fill="#458038" opacity=".82"/>
+  <ellipse cx="762" cy="208" rx="36"  ry="30"  fill="#6eb052" opacity=".44"/>
+</g>
+
+<!-- TREE LABELS (updated by JS) -->
+<g font-family="'Noto Sans KR', sans-serif">
+  <text x="115" y="466" text-anchor="middle" font-size="10.5" fill="rgba(42,32,24,.55)">취약계층 아동·노인</text>
+  <text id="lb1" x="115" y="480" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9.5" fill="rgba(42,32,24,.38)">0켤레 · 0마리</text>
+  <text x="322" y="472" text-anchor="middle" font-size="10.5" fill="rgba(42,32,24,.55)">소방·구급대</text>
+  <text id="lb2" x="322" y="486" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9.5" fill="rgba(42,32,24,.38)">0켤레 · 0마리</text>
+  <text x="560" y="466" text-anchor="middle" font-size="10.5" fill="rgba(42,32,24,.55)">노숙인</text>
+  <text id="lb3" x="560" y="480" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9.5" fill="rgba(42,32,24,.38)">0켤레 · 0마리</text>
+  <text x="762" y="469" text-anchor="middle" font-size="10.5" fill="rgba(42,32,24,.55)">사회복지사</text>
+  <text id="lb4" x="762" y="483" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9.5" fill="rgba(42,32,24,.38)">0켤레 · 0마리</text>
+</g>
+
+<!-- Perch dots (empty slots) -->
+<g id="dots"/>
+<!-- Birds -->
+<g id="birds"/>
+
+</svg>
+</div>
+
 <div class="total-bar">
   <strong id="total-cnt">0</strong>켤레 적립 &nbsp;·&nbsp; <strong id="total-birds">0</strong>마리 자리함
 </div>
-
-<div class="tree-grid" id="tree-grid"></div>
 
 <button class="share-btn" id="share-btn" onclick="copyLink()">🔗 &nbsp; 링크 복사해서 공유하기</button>
 <div class="ft">JJTT — BUY ONE GIVE ONE &nbsp;·&nbsp; jacktweet.com</div>
@@ -61,27 +224,64 @@ html,body{background:#f5f0e8;font-family:'Noto Sans KR',sans-serif}
 <script>
 const API='https://jjtt-webhook.vercel.app/api/status';
 
-const CATS={
-  cat1:{color:'#4a95c0',name:'취약계층 아동·노인'},
-  cat2:{color:'#d96030',name:'소방·구급대'},
-  cat3:{color:'#3ea060',name:'노숙인'},
-  cat4:{color:'#9f4eb8',name:'사회복지사'}
-};
-
-const PERCHES=[
-  {x:104,y:175},{x:79,y:161},{x:55,y:146},{x:33,y:131},{x:18,y:117},
-  {x:156,y:172},{x:181,y:158},{x:205,y:145},{x:227,y:130},{x:242,y:116}
+// Natural bird color palette (not category-coded)
+const PAL=[
+  '#c05020','#5878a0','#789030','#d07820',
+  '#b84868','#286878','#b09018','#884898',
+  '#886028','#488448','#a03820','#504898',
+  '#c87840','#306858','#a06028','#485890'
 ];
 
-function birdN(n){return Math.min(10,Math.floor(n/10));}
+// Perch positions per category (on/near branches in 920x520 space)
+const PERCHES={
+  cat1:[
+    {x:80,y:278},{x:59,y:258},{x:40,y:239},{x:24,y:221},{x:8,y:203},
+    {x:147,y:276},{x:167,y:256},{x:185,y:237},{x:201,y:219},{x:215,y:202}
+  ],
+  cat2:[
+    {x:258,y:308},{x:228,y:292},{x:200,y:278},{x:174,y:265},{x:150,y:252},
+    {x:386,y:305},{x:416,y:289},{x:444,y:274},{x:470,y:260},{x:492,y:247}
+  ],
+  cat3:[
+    {x:505,y:275},{x:483,y:261},{x:463,y:247},{x:446,y:235},
+    {x:598,y:267},{x:628,y:251},{x:657,y:237},{x:683,y:223},{x:707,y:210},
+    {x:540,y:290}
+  ],
+  cat4:[
+    {x:716,y:273},{x:694,y:256},{x:674,y:241},{x:656,y:227},{x:641,y:215},
+    {x:806,y:270},{x:828,y:254},{x:848,y:240},{x:865,y:227},{x:880,y:215}
+  ]
+};
 
-function makeBird(x,y,color,delay,flip){
-  const s=0.60,fx=flip?-1:1,yOff=Math.round(15*s);
-  const bd=(2.4+Math.random()*2).toFixed(1);
-  const dd=(Math.random()*1.5).toFixed(1);
-  return `<g class="bird-g" style="animation-delay:${delay}s">
-<g transform="translate(${x},${y-yOff}) scale(${fx*s},${s})">
-<g class="bird-bd" style="--bd:${bd}s;--dd:${dd}s">
+const LB_IDS={cat1:'lb1',cat2:'lb2',cat3:'lb3',cat4:'lb4'};
+
+function birdN(n){return Math.min(10,Math.floor(n/10));}
+function rnd(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+// 3 bird body types for variety
+function bodyPaths(type, color){
+  if(type==='B') return `
+<path d="M-16,2 L-26,-2 L-24,6Z" fill="${color}" opacity=".80"/>
+<ellipse cx="0" cy="0" rx="11" ry="7" fill="${color}"/>
+<circle cx="13" cy="-5" r="7" fill="${color}"/>
+<path d="M18,-4.5 L25,-3 L18,-1.5Z" fill="#8B5E3C"/>
+<circle cx="14.5" cy="-6.5" r="2" fill="white"/>
+<circle cx="15" cy="-6.8" r="1" fill="#111"/>
+<path d="M-5,-4 Q3,-13 11,-4" stroke="rgba(255,255,255,.28)" stroke-width="1.8" fill="none"/>
+<path d="M-1,7 L-3,13 M-1,7 L1,13" stroke="#8B5E3C" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+<path d="M3,7 L1,13 M3,7 L5,13" stroke="#8B5E3C" stroke-width="1.3" fill="none" stroke-linecap="round"/>`;
+  if(type==='C') return `
+<path d="M-13,4 L-21,-2 L-20,8Z" fill="${color}" opacity=".83"/>
+<ellipse cx="0" cy="0" rx="15" ry="11" fill="${color}"/>
+<circle cx="16" cy="-6" r="9" fill="${color}"/>
+<path d="M22,-5.5 L29,-4 L22,-2.5Z" fill="#8B5E3C"/>
+<circle cx="17.5" cy="-7.5" r="2.5" fill="white"/>
+<circle cx="18" cy="-7.8" r="1.2" fill="#111"/>
+<circle cx="18.8" cy="-8.4" r=".5" fill="white"/>
+<path d="M-3,-6 Q5,-16 14,-6" stroke="rgba(255,255,255,.26)" stroke-width="2.2" fill="none"/>
+<path d="M-1,11 L-3,17 M-1,11 L1,17" stroke="#8B5E3C" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+<path d="M4,11 L2,17 M4,11 L6,17" stroke="#8B5E3C" stroke-width="1.6" fill="none" stroke-linecap="round"/>`;
+  return `
 <path d="M-14,3 L-23,-2 L-21,7Z" fill="${color}" opacity=".82"/>
 <ellipse cx="0" cy="0" rx="13" ry="9" fill="${color}"/>
 <circle cx="14" cy="-6" r="8" fill="${color}"/>
@@ -91,81 +291,59 @@ function makeBird(x,y,color,delay,flip){
 <circle cx="16.8" cy="-8.4" r=".5" fill="white"/>
 <path d="M-4,-5 Q4,-14 12,-5" stroke="rgba(255,255,255,.3)" stroke-width="2" fill="none"/>
 <path d="M-1,9 L-3,15 M-1,9 L1,15" stroke="#8B5E3C" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-<path d="M3,9 L1,15 M3,9 L5,15" stroke="#8B5E3C" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+<path d="M3,9 L1,15 M3,9 L5,15" stroke="#8B5E3C" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+}
+
+function makeBird(x,y,delay){
+  const color=rnd(PAL);
+  const type=rnd(['A','A','B','C']); // A more common
+  const s=(0.52+Math.random()*0.18).toFixed(2);
+  const flip=Math.random()>.5;
+  const fx=flip?-1:1;
+  const dir=rnd(['fl','fl','fr','ft2']); // mostly fly from left
+  const yOff=Math.round(15*s);
+  const bd=(2.2+Math.random()*2.2).toFixed(1);
+  const dd=(Math.random()*1.8).toFixed(1);
+  return `<g class="bird-g ${dir}" style="animation-delay:${delay}s">
+<g transform="translate(${x},${y-yOff}) scale(${fx*s},${s})">
+<g class="bird-bd" style="--bd:${bd}s;--dd:${dd}s">
+${bodyPaths(type,color)}
 </g></g></g>`;
 }
 
 function makePerch(x,y){
-  return `<circle cx="${x}" cy="${y-3}" r="2.5" fill="none" stroke="#9a8060" stroke-width=".8" opacity=".2"/>`;
-}
-
-function buildTree(key,count,globalDelay){
-  const color=CATS[key].color;
-  const n=birdN(count);
-  let birds='',dots='',d=globalDelay;
-  for(let i=0;i<10;i++){
-    const p=PERCHES[i];
-    if(i<n){birds+=makeBird(p.x,p.y,color,d,i%3===0);d+=0.11;}
-    else{dots+=makePerch(p.x,p.y);}
-  }
-  const sw=(5.5+Math.random()).toFixed(1);
-  const sd=(Math.random()*4).toFixed(1);
-  const svg=`<svg viewBox="0 0 260 295" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<linearGradient id="sk${key}" x1="0" y1="0" x2="0" y2="1">
-<stop offset="0%" stop-color="#cce0f4"/><stop offset="100%" stop-color="#ede4d0"/>
-</linearGradient>
-<filter id="lf${key}" x="-15%" y="-15%" width="130%" height="130%">
-<feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="rgba(0,50,0,.14)"/>
-</filter>
-</defs>
-<rect width="260" height="295" fill="url(#sk${key})"/>
-<ellipse cx="130" cy="284" rx="108" ry="14" fill="#c2ac74" opacity=".3"/>
-<path d="M130,288 C128,263 126,236 127,214 C128,197 130,182 130,168" stroke="#7c4e2c" stroke-width="20" fill="none" stroke-linecap="round"/>
-<path d="M129,182 C110,179 87,169 63,155 C42,143 25,130 12,115" stroke="#7c4e2c" stroke-width="11" fill="none" stroke-linecap="round"/>
-<path d="M131,178 C152,175 175,165 198,151 C219,139 236,127 248,113" stroke="#7c4e2c" stroke-width="11" fill="none" stroke-linecap="round"/>
-<path d="M74,160 C60,147 46,133 36,119" stroke="#7c4e2c" stroke-width="7" fill="none" stroke-linecap="round"/>
-<path d="M186,157 C200,144 212,131 222,117" stroke="#7c4e2c" stroke-width="7" fill="none" stroke-linecap="round"/>
-<g style="transform-origin:130px 288px;animation:sway ${sw}s ease-in-out infinite -${sd}s" filter="url(#lf${key})">
-<ellipse cx="130" cy="92"  rx="94"  ry="74"  fill="#3c6c33" opacity=".91"/>
-<ellipse cx="88"  cy="112" rx="66"  ry="53"  fill="#4d8840" opacity=".87"/>
-<ellipse cx="172" cy="110" rx="66"  ry="53"  fill="#4d8840" opacity=".87"/>
-<ellipse cx="36"  cy="117" rx="52"  ry="44"  fill="#3c6c33" opacity=".88"/>
-<ellipse cx="224" cy="114" rx="52"  ry="44"  fill="#3c6c33" opacity=".88"/>
-<ellipse cx="130" cy="74"  rx="70"  ry="55"  fill="#5a9848" opacity=".78"/>
-<ellipse cx="130" cy="57"  rx="44"  ry="35"  fill="#70b055" opacity=".43"/>
-</g>
-<g>${dots}</g>
-<g>${birds}</g>
-</svg>`;
-  return{svg,delay:d};
+  return `<circle cx="${x}" cy="${y-3}" r="3" fill="none" stroke="#9a8060" stroke-width=".8" opacity=".18"/>`;
 }
 
 function render(data){
-  const grid=document.getElementById('tree-grid');
-  grid.innerHTML='';
-  let delay=0,totalBirds=0,totalCnt=0;
-  for(const[key,cfg]of Object.entries(CATS)){
+  let birds='', dots='', delay=0, totalBirds=0, totalCnt=0;
+
+  for(const[key,perches]of Object.entries(PERCHES)){
     const cnt=(data[key]||{}).count||0;
     const n=birdN(cnt);
-    totalCnt+=cnt;totalBirds+=n;
-    const res=buildTree(key,cnt,delay);
-    delay=res.delay;
-    const card=document.createElement('div');
-    card.className='tree-card';
-    card.innerHTML=`${res.svg}
-<div class="tree-info">
-  <div class="t-dot" style="background:${cfg.color}"></div>
-  <div>
-    <div class="t-name">${cfg.name}</div>
-    <div class="t-cnt">${cnt.toLocaleString()}켤레 · ${n}마리</div>
-  </div>
-</div>`;
-    grid.appendChild(card);
+    totalCnt+=cnt; totalBirds+=n;
+
+    // Update label
+    const lbEl=document.getElementById(LB_IDS[key]);
+    if(lbEl)lbEl.textContent=`${cnt.toLocaleString()}켤레 · ${n}마리`;
+
+    for(let i=0;i<10;i++){
+      const p=perches[i];
+      if(i<n){birds+=makeBird(p.x,p.y,delay);delay+=0.10;}
+      else    {dots+=makePerch(p.x,p.y);}
+    }
   }
+
+  document.getElementById('birds').innerHTML=birds;
+  document.getElementById('dots').innerHTML=dots;
+
   const anim=(el,target)=>{
-    const t0=performance.now(),dur=1400;
-    const tick=now=>{const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.floor(e*target).toLocaleString();if(p<1)requestAnimationFrame(tick);};
+    const t0=performance.now(),dur=1500;
+    const tick=now=>{
+      const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,3);
+      el.textContent=Math.floor(e*target).toLocaleString();
+      if(p<1)requestAnimationFrame(tick);
+    };
     requestAnimationFrame(tick);
   };
   anim(document.getElementById('total-cnt'),totalCnt);
