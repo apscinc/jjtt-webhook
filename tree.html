@@ -269,8 +269,8 @@ function birdN(n){ if(!n)return 0; return Math.max(1,Math.min(MAX,Math.floor(n/(
 function makeBird(x,y,color,delay,flip){
   const s=.78, fx=flip?-1:1;
   return `<g class="bird-g" style="animation-delay:${delay}s">
-<g class="bird-bd" style="--bd:${(2.5+Math.random()*2).toFixed(1)}s;--dd:${(Math.random()*2).toFixed(1)}s"
-   transform="translate(${x},${y-11}) scale(${fx*s},${s})">
+<g transform="translate(${x},${y-11}) scale(${fx*s},${s})">
+<g class="bird-bd" style="--bd:${(2.5+Math.random()*2).toFixed(1)}s;--dd:${(Math.random()*2).toFixed(1)}s">
 <path d="M-14,3 L-23,-2 L-21,7Z" fill="${color}" opacity=".84"/>
 <ellipse cx="0" cy="0" rx="13" ry="9" fill="${color}"/>
 <circle cx="14" cy="-6" r="8" fill="${color}"/>
@@ -281,7 +281,7 @@ function makeBird(x,y,color,delay,flip){
 <path d="M-4,-5 Q4,-14 12,-5" stroke="rgba(255,255,255,.3)" stroke-width="2" fill="none"/>
 <path d="M-1,9 L-3,15 M-1,9 L1,15" stroke="#8B5E3C" stroke-width="1.5" fill="none" stroke-linecap="round"/>
 <path d="M3,9 L1,15 M3,9 L5,15"    stroke="#8B5E3C" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-</g></g>`;
+</g></g></g>`;
 }
 
 function makePerch(x,y){
