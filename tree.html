@@ -10,26 +10,57 @@
 html,body{background:#ffffff;font-family:'Noto Sans KR',sans-serif}
 .page{max-width:960px;margin:0 auto;padding:24px 16px 48px}
 .hd{text-align:center;margin-bottom:16px}
-.hd-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.3em;color:#8a6a2a;border:1px solid rgba(138,106,42,.3);padding:5px 14px;margin-bottom:10px}
-.hd-title{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:.05em;color:#2a2018}
+.hd-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.3em;color:#8a6a2a;border:1px solid rgba(138,106,42,.3);padding:5px 14px;margin-bottom:10px}
+.hd-title{font-family:'Bebas Neue',sans-serif;font-size:38px;letter-spacing:.05em;color:#2a2018}
 .hd-sub{font-size:14px;color:rgba(42,32,24,.48);margin-top:5px;letter-spacing:.03em}
 
 .scene{background:white;border-radius:16px;overflow:hidden;box-shadow:0 6px 32px rgba(0,0,0,.1)}
 #sv{width:100%;display:block}
 
-/* 나무 레이블 — SVG 밖 HTML */
-.tree-labels{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
-.tree-label{text-align:center;background:white;border-radius:10px;padding:10px 6px 12px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.tl-name{font-size:14px;font-weight:500;color:#2a2018;line-height:1.4}
-.tl-cnt{font-family:'DM Mono',monospace;font-size:14px;color:rgba(42,32,24,.5);margin-top:4px;letter-spacing:.04em}
-@media(max-width:400px){.tree-labels{grid-template-columns:repeat(2,1fr)}}
+/* 오로라 메시 그라데이션 */
+@keyframes aurora{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.aurora-base{background-size:300% 300%;animation:aurora 8s ease infinite}
 
-.total-bar{display:flex;justify-content:center;align-items:baseline;gap:6px;margin-top:12px;font-family:'DM Mono',monospace;font-size:14px;color:rgba(42,32,24,.5);letter-spacing:.08em}
-.total-bar strong{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#2a2018;letter-spacing:.03em}
-.share-btn{display:block;width:100%;margin-top:12px;padding:12px;background:white;border:1px solid rgba(138,106,42,.2);border-radius:10px;font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.12em;color:#8a6a2a;cursor:pointer;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:background .2s}
-.share-btn:hover{background:white}
-.share-btn.ok{background:#f0f8ec;color:#4a7a30;border-color:rgba(74,122,48,.3)}
-.ft{text-align:center;margin-top:16px;font-family:'DM Mono',monospace;font-size:12px;letter-spacing:.18em;color:rgba(42,32,24,.28)}
+/* 나무 레이블 */
+.tree-labels{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.tree-label{border-radius:14px;padding:14px 12px 15px;border:1px solid rgba(255,255,255,.6);position:relative;overflow:hidden}
+.tree-label:nth-child(1){background:linear-gradient(135deg,#e0f4ff 0%,#d4eaff 40%,#e8f8f0 100%)}
+.tree-label:nth-child(2){background:linear-gradient(135deg,#fff0e8 0%,#ffe4d4 40%,#fff8e0 100%)}
+.tree-label:nth-child(3){background:linear-gradient(135deg,#e8f0ff 0%,#dce8ff 40%,#edf4ff 100%)}
+.tree-label:nth-child(4){background:linear-gradient(135deg,#f4e8ff 0%,#ead4ff 40%,#fce8f8 100%)}
+.tree-label::before{content:'';position:absolute;inset:0;background:inherit;filter:blur(18px);opacity:.45;z-index:0}
+.tree-label > *{position:relative;z-index:1}
+.tl-name{font-size:13px;font-weight:500;color:#1a1a2e;line-height:1.4;margin-bottom:6px}
+.tl-cnt{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:#1a1a2e;letter-spacing:.02em}
+.tl-cnt span{color:rgba(26,26,46,.4);font-size:12px;font-weight:400}
+.tl-bar-wrap{margin-top:8px;background:rgba(0,0,0,.1);border-radius:99px;height:5px;overflow:hidden}
+.tl-bar{height:5px;border-radius:99px;background:linear-gradient(90deg,#4ec9b0,#56d478,#a8e063);transition:width 1.2s cubic-bezier(.34,1.56,.64,1)}
+@media(max-width:480px){.tree-labels{grid-template-columns:repeat(2,1fr)}}
+
+/* 총계 섹션 — 오로라 */
+.summary{margin-top:12px;border-radius:16px;padding:20px 22px;border:1px solid rgba(255,255,255,.5);background:linear-gradient(135deg,#e8f8f0 0%,#e0f0ff 35%,#f0e8ff 70%,#fff8e8 100%);background-size:300% 300%;animation:aurora 10s ease infinite;position:relative;overflow:hidden}
+.summary::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(78,201,176,.18) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(138,101,255,.15) 0%,transparent 55%),radial-gradient(ellipse at 60% 80%,rgba(86,212,120,.14) 0%,transparent 50%);pointer-events:none}
+.summary > *{position:relative;z-index:1}
+.summary-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.summary-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:#1a1a2e;letter-spacing:.03em;line-height:1}
+.summary-unit{font-family:'DM Mono',monospace;font-size:14px;color:rgba(26,26,46,.5);letter-spacing:.06em}
+.summary-desc{font-size:13px;color:rgba(26,26,46,.55);margin-top:6px;line-height:1.7}
+.summary-desc strong{color:#2a8050;font-weight:500}
+.summary-divider{border:none;border-top:1px solid rgba(0,0,0,.08);margin:14px 0}
+.summary-donations{display:flex;align-items:center;gap:14px}
+.donation-badge{font-family:'Bebas Neue',sans-serif;font-size:36px;color:#2a7a50;letter-spacing:.03em;line-height:1}
+.donation-label strong{display:block;font-size:14px;font-weight:500;color:#1a1a2e;line-height:1.4}
+.donation-label span{font-size:12px;color:rgba(26,26,46,.45)}
+
+/* 공유 버튼 — 아이보리/화이트 */
+.share-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:12px;padding:18px 24px;background:linear-gradient(135deg,#ffffff 0%,#faf6ee 50%,#f5ede0 100%);border:1px solid rgba(180,150,100,.18);border-radius:14px;font-family:'DM Mono',monospace;font-size:13px;letter-spacing:.14em;color:#3a2e1e;cursor:pointer;transition:opacity .18s,transform .1s;position:relative;overflow:hidden}
+.share-btn::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 25% 60%,rgba(200,180,140,.15) 0%,transparent 60%),radial-gradient(ellipse at 75% 30%,rgba(240,220,180,.18) 0%,transparent 55%);pointer-events:none}
+.share-btn span,.share-btn svg{position:relative;z-index:1}
+.share-btn:hover{opacity:.85}
+.share-btn:active{transform:scale(.985)}
+.share-btn.ok{background:linear-gradient(135deg,#eef8f0,#dcf0e4);color:#2a6040;border-color:rgba(60,140,80,.2)}
+.share-icon{width:17px;height:17px;flex-shrink:0;stroke:#8a6a2a}
+.ft{text-align:center;margin-top:18px;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.18em;color:rgba(42,32,24,.28)}
 
 @keyframes charSway{0%,100%{transform:rotate(0deg)}50%{transform:rotate(1.8deg)}}
 .char-body{transform-box:fill-box;transform-origin:50% 100%;animation:charSway var(--sw,3.5s) ease-in-out infinite var(--sd,0s)}
@@ -339,30 +370,63 @@ html,body{background:#ffffff;font-family:'Noto Sans KR',sans-serif}
 </svg>
 </div>
 
-<!-- 나무 레이블 — HTML (모바일 가독성) -->
+<!-- 기부처별 카드 -->
 <div class="tree-labels">
-  <div class="tree-label"><div class="tl-name">취약계층 아동·노인</div><div class="tl-cnt" id="lb1">0켤레</div></div>
-  <div class="tree-label"><div class="tl-name">소방·구급대</div><div class="tl-cnt" id="lb2">0켤레</div></div>
-  <div class="tree-label"><div class="tl-name">노숙인</div><div class="tl-cnt" id="lb3">0켤레</div></div>
-  <div class="tree-label"><div class="tl-name">사회복지사</div><div class="tl-cnt" id="lb4">0켤레</div></div>
+  <div class="tree-label">
+    <div class="tl-name">🧒 취약계층 아동·노인</div>
+    <div class="tl-cnt" id="lb1">0<span> / 2,000켤레</span></div>
+    <div class="tl-bar-wrap"><div class="tl-bar" id="bar1" style="width:0%"></div></div>
+  </div>
+  <div class="tree-label">
+    <div class="tl-name">🚒 소방·구급대</div>
+    <div class="tl-cnt" id="lb2">0<span> / 2,000켤레</span></div>
+    <div class="tl-bar-wrap"><div class="tl-bar" id="bar2" style="width:0%"></div></div>
+  </div>
+  <div class="tree-label">
+    <div class="tl-name">🤝 노숙인</div>
+    <div class="tl-cnt" id="lb3">0<span> / 2,000켤레</span></div>
+    <div class="tl-bar-wrap"><div class="tl-bar" id="bar3" style="width:0%"></div></div>
+  </div>
+  <div class="tree-label">
+    <div class="tl-name">💼 사회복지사</div>
+    <div class="tl-cnt" id="lb4">0<span> / 2,000켤레</span></div>
+    <div class="tl-bar-wrap"><div class="tl-bar" id="bar4" style="width:0%"></div></div>
+  </div>
 </div>
 
-<div class="total-bar">
-  <strong id="total-cnt">0</strong>켤레 함께 적립 중
+<!-- 총계 + 누적 기부 -->
+<div class="summary">
+  <div class="summary-top">
+    <div class="summary-num" id="total-cnt">0</div>
+    <div class="summary-unit">켤레 함께 적립 중</div>
+  </div>
+  <div class="summary-desc">카테고리별 <strong>2,000켤레</strong> 도달 시 기부용 양말이 출발합니다</div>
+  <hr class="summary-divider">
+  <div class="summary-donations">
+    <div class="donation-badge" id="donation-cnt">0</div>
+    <div class="donation-label">
+      <strong>지금까지 총 누적 기부 횟수</strong>
+      <span>2,000켤레 단위로 기부가 실행됩니다</span>
+    </div>
+  </div>
 </div>
-<button class="share-btn" id="share-btn" onclick="copyLink()">🔗 &nbsp; 링크 복사해서 공유하기</button>
+
+<button class="share-btn" id="share-btn" onclick="copyLink()">
+  <svg class="share-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+  <span>링크 복사해서 공유하기</span>
+</button>
 <div class="ft">JJTT — BUY ONE GIVE ONE &nbsp;·&nbsp; jacktweet.com</div>
 </div>
 
 <script>
 const API='https://jjtt-webhook.vercel.app/api/status';
 
-// 밝고 생기 있는 색상 팔레트
+// 파스텔 + 아이보리/노란 색상 팔레트
 const PAL=[
-  '#FF5252','#FF8C42','#FFCA3A','#6BCB77',
-  '#4D96FF','#C77DFF','#FF6B9D','#00C9A7',
-  '#FF595E','#56CFE1','#9B5DE5','#F15BB5',
-  '#FEE440','#00BBF9','#00F5D4','#FF7F51'
+  '#F4A4A4','#F4C08C','#F4E08C','#F0F0A0',
+  '#B8E8C8','#A8D8F0','#C4B8F0','#F0B8D8',
+  '#FAECD0','#F5F0C0','#D4EEC8','#B8D8F4',
+  '#F0D8B8','#E8C8F0','#C8E8E0','#F4D4A0'
 ];
 
 // 크라운 전체에 분산된 퍼치 위치
@@ -418,23 +482,40 @@ function makeBird(x,y,delay){
 function makePerch(x,y){return`<circle cx="${x}" cy="${y-3}" r="3" fill="none" stroke="#9a8060" stroke-width=".8" opacity=".15"/>`;}
 
 function render(data){
-  let birds='',dots='',delay=0,totalCnt=0;
-  for(const[key,perches]of Object.entries(PERCHES)){
+  let birds='',dots='',delay=0,totalCnt=0,totalDonations=0;
+  const GOAL=2000;
+  const keys=['cat1','cat2','cat3','cat4'];
+  const barIds=['bar1','bar2','bar3','bar4'];
+
+  keys.forEach((key,i)=>{
     const cnt=(data[key]||{}).count||0,n=birdN(cnt);
     totalCnt+=cnt;
-    const el=document.getElementById(LB[key]);
-    if(el)el.textContent=`${cnt.toLocaleString()}켤레`;
-    for(let i=0;i<10;i++){
-      const p=perches[i];
-      if(i<n){birds+=makeBird(p.x,p.y,delay);delay+=0.10;}
+    totalDonations+=Math.floor(cnt/GOAL);
+
+    const lbEl=document.getElementById(LB[key]);
+    if(lbEl)lbEl.innerHTML=`${cnt.toLocaleString()}<span> / 2,000켤레</span>`;
+
+    const barEl=document.getElementById(barIds[i]);
+    if(barEl) setTimeout(()=>{barEl.style.width=Math.min(100,(cnt/GOAL*100)).toFixed(1)+'%'},100);
+
+    const perches=PERCHES[key];
+    for(let j=0;j<10;j++){
+      const p=perches[j];
+      if(j<n){birds+=makeBird(p.x,p.y,delay);delay+=0.10;}
       else{dots+=makePerch(p.x,p.y);}
     }
-  }
+  });
+
   document.getElementById('birds').innerHTML=birds;
   document.getElementById('dots').innerHTML=dots;
-  const el=document.getElementById('total-cnt'),t0=performance.now(),dur=1500;
-  const tick=now=>{const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.floor(e*totalCnt).toLocaleString();if(p<1)requestAnimationFrame(tick);};
-  requestAnimationFrame(tick);
+
+  const anim=(el,target)=>{
+    const t0=performance.now(),dur=1500;
+    const tick=now=>{const p=Math.min((now-t0)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.floor(e*target).toLocaleString();if(p<1)requestAnimationFrame(tick);};
+    requestAnimationFrame(tick);
+  };
+  anim(document.getElementById('total-cnt'),totalCnt);
+  anim(document.getElementById('donation-cnt'),totalDonations);
 }
 
 function copyLink(){
