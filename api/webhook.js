@@ -2,9 +2,11 @@
 // JJTT 카페24 Webhook 수신 서버
 // 주문 접수 → +N / 취소 → -N / 2000 달성 → 자동 리셋
 // 주문/취소 모두 중복 방지, 수량 반영
+// + Migration: 주문 1건 = 새 1마리 적재          [추가됨]
 // ============================================================
 
 const { createClient } = require('@supabase/supabase-js');
+const { recordMigration, removeMigration } = require('../lib/migration.js'); // [추가됨]
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -30,15 +32,16 @@ function extractCategories(orderData) {
     for (const item of items) {
       const optionValue = item?.option_value || '';
       const qty = parseInt(item?.qty) || 1;
+      const productName = item?.product_name || item?.product_name_default || ''; // [추가됨]
       const cat = detectCategory(optionValue);
-      if (cat) categories.push({ cat, optionValue, qty });
+      if (cat) categories.push({ cat, optionValue, qty, productName });
 
       // 기존 방식 (options 배열)
       const options = item?.options || item?.product_options || [];
       for (const opt of options) {
         const val = opt?.value || opt?.option_value || opt?.name || '';
         const c = detectCategory(val);
-        if (c) categories.push({ cat: c, optionValue: val, qty });
+        if (c) categories.push({ cat: c, optionValue: val, qty, productName });
       }
     }
   } catch (e) {
@@ -149,6 +152,14 @@ module.exports = async function handler(req, res) {
       });
 
       console.log(`[${logAction}] ${cat} x${qty} for order ${orderId}`);
+    }
+
+    // ── Migration: 새 추가/제거 ── [추가됨]
+    // 기부 카운팅이 전부 끝난 뒤 호출. 실패해도 위 로직에 영향 없음
+    if (isCancel) {
+      await removeMigration(orderId);
+    } else {
+      await recordMigration({ orderId, resource: body?.resource || body, categories });
     }
 
     return res.status(200).json({ success: true, orderId, action: logAction, categories });
